@@ -1,27 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-
-    [SerializeField]
-    GameObject Player;
-
-    Rigidbody rb;
-
-    float movementSpeed = 5000f;
-
-    private void Awake()
+    private void Update()
     {
-        rb = gameObject.GetComponent<Rigidbody>();
+        if (Input.GetMouseButtonDown(0)) // Clic sinistro del mouse
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+
+                if (hit.collider.CompareTag("Square")) // Assicurati di assegnare il tag "Cube" ai tuoi cubi
+                {
+                    SquareStatus squareStatus = hit.collider.GetComponent<SquareStatus>();
+                    if (squareStatus != null && !squareStatus.isOccupied)
+                    {
+                        MoveTo(hit.collider.transform.position);
+                    }
+                }
+            }
+        }
     }
-    void Update()
+
+    private void MoveTo(Vector3 targetPosition)
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        rb.velocity = new Vector3(-horizontal * movementSpeed * Time.deltaTime, 0f, -vertical * movementSpeed * Time.deltaTime);
-
+        Occupier occupier = GetComponent<Occupier>();
+        if (occupier)
+        {
+            occupier.MoveTo(targetPosition);
+        }
     }
 }
